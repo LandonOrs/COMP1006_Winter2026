@@ -1,25 +1,43 @@
 <?php
-// Sanitize and validate user inputs
-$firstName = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_SPECIAL_CHARS); 
-$lastName = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_SPECIAL_CHARS); 
-$address = filter_input(INPUT_POST, 'address', FILTER_SANITIZE_SPECIAL_CHARS);
-$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-$phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
-
-$errors = [];
-if (!$firstName) $errors['first_name'] = "First name is required.";
-if (!$lastName) $errors['last_name'] = "Last name is required.";
-if (!$address) $errors['address'] = "Address is required.";
-if (!$email) $errors['email'] = "Email is required.";
-if (!$phone) $errors['phone'] = "Phone number is required.";
-if (!preg_match('/^\d{3}-\d{3}-\d{4}$/', $phone)) {
- $errors['phone'] = "Phone number must be in the format 555-123-4567.";
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo "<p>Invalid request.</p>";
+    exit;
 }
 
-// Shows Errors 
+// Sanitize inputs
+$firstName = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_SPECIAL_CHARS);
+$lastName  = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_SPECIAL_CHARS);
+$email     = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+$message   = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_SPECIAL_CHARS);
+
+$errors = [];
+// Makes ure all info user enterd is vallid
+if (!$firstName) $errors[] = "First name is required.";
+if (!$lastName)  $errors[] = "Last name is required.";
+
+if (!$email) {
+    $errors[] = "Email is required.";
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = "Email must be valid.";
+}
+
+if (!$message) $errors[] = "Message is required.";
+
+// Show errors
 if (!empty($errors)) {
-    foreach ($errors as $field => $error) {
-        echo "<p>Error in $field: $error</p>";
+    foreach ($errors as $error) {
+        echo "<p>$error</p>";
     }
     exit;
- }
+}
+
+// Email bakery
+$to = "info@bakery.com";
+$subject = "New Contact Form Message";
+$body = "From: $firstName $lastName\nEmail: $email\n\nMessage:\n$message";
+$headers = "From: $email";
+
+// Message receipt
+
+echo "<h2>Thank you, $firstName!</h2>";
+echo "<p>Your info has been sent.</p>";

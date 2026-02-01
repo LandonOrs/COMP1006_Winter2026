@@ -1,4 +1,3 @@
-<?php require 'includes/header.php'; ?>
 
 <main>
 <form action="process.php" method="post">
@@ -21,6 +20,8 @@
     <input type="tel" name="phone" id="phone" required pattern="^\d{3}-\d{3}-\d{4}$"
            placeholder="555-123-4567"
            value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" autocomplete="tel">
+
+           
   </fieldset>
 
  
@@ -28,5 +29,4 @@
 </form>
 </main>
 
-<?php require 'includes/footer.php'; ?>
 
